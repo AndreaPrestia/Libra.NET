@@ -7,6 +7,9 @@ using System.Collections.Concurrent;
 
 namespace Libra.Net.Algorithms
 {
+	/// <summary>
+	/// This class implements the RoundRobin load balancing algorithm
+	/// </summary>
 	internal class RoundRobinBalancingAlgorithm : ILoadBalancingAlgorithm
 	{
 		private ConcurrentBag<string> _servers;

@@ -7,6 +7,9 @@ using System.Collections.Concurrent;
 
 namespace Libra.Net.Algorithms
 {
+	/// <summary>
+	/// This class implements the WeightedRoundRobin load balancing algorithm
+	/// </summary>
 	internal class WeightedRoundRobinBalancingAlgorithm : ILoadBalancingAlgorithm
 	{
 		private ConcurrentDictionary<string, int>? _servers;

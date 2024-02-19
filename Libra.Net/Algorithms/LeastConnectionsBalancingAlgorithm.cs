@@ -7,6 +7,9 @@ using System.Collections.Concurrent;
 
 namespace Libra.Net.Algorithms
 {
+	/// <summary>
+	/// This class implements the LeastConnections load balancing algorithm
+	/// </summary>
 	internal class LeastConnectionsBalancingAlgorithm : ILoadBalancingAlgorithm
 	{
 		private ConcurrentDictionary<string, int>? _servers;
