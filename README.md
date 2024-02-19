@@ -43,6 +43,28 @@ Property | Type | Context | Allowed Values |
 LoadBalancingPolicy | string | The value of the load balancing algorithm to apply. | RoundRobin, WeightedRoundRobin, LeastConnections |
 Servers | array<string> | The list of servers that are under load balancing. | A valid ipaddress (with or without port) or an hostname |
 
+### Usage
+
+**Libra.NET** exposes one extension:
+
+```
+AddLibraNet(this IHostBuilder builder);
+```
+
+#### AddLibraNet
+This extension it is used for:
+
+- Inject LoadBalancingConfiguration.
+- Register load balancing algorithms.
+
+It must be used to use **Libra.NET**
+
+### LoadBalacingMiddleware
+
+To use in a simple way **Libra.NET** it has been created a middleware, called **LoadBalancingMiddleware**.
+
+It is an **ASP.NET** middleware that , using the **LoadBalancingConfiguration.LoadBalancingPolicy** retrieves the correct algorithm and forwards it to the destination server found.
+
 ## TODO
 
 - Unit testing
