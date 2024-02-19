@@ -1,4 +1,5 @@
 ﻿using Libra.Net.Configurations;
+using Libra.Net.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,9 @@ using System.Text.Json;
 
 namespace Libra.Net.Middleware
 {
+	/// <summary>
+	/// This is a middleware that uses the LoadBalancingConfiguration to retrieve the correct ILoadBalancingAlgorithm implementation and forward the request to the server found with HttpRequestManager
+	/// </summary>
 	public class LoadBalancingMiddleware
 	{
 		private readonly RequestDelegate _next;
@@ -40,8 +44,8 @@ namespace Libra.Net.Middleware
 				_logger.LogInformation($"Processing request {url} {method}");
 
 				var loadBalancingPolicy = _optionsMonitor.CurrentValue.LoadBalancingPolicy;
-
-				var algorithm = _loadBalancingAlgorithmFactory.ResolveByPolicy(_optionsMonitor.CurrentValue.LoadBalancingPolicy);
+				var loadBalancingPolicyEnumValue = (LoadBalancingPolicy)Enum.Parse(typeof(LoadBalancingPolicy), loadBalancingPolicy);
+				var algorithm = _loadBalancingAlgorithmFactory.ResolveByPolicy(loadBalancingPolicyEnumValue);
 
 				if (algorithm == null)
 				{

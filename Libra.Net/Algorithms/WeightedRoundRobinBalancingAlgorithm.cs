@@ -10,7 +10,6 @@ namespace Libra.Net.Algorithms
 	internal class WeightedRoundRobinBalancingAlgorithm : ILoadBalancingAlgorithm
 	{
 		private readonly ConcurrentDictionary<string, int>? _servers;
-		private readonly IOptionsMonitor<LoadBalancingConfiguration> _optionsMonitor;
 		private readonly ILogger<WeightedRoundRobinBalancingAlgorithm> _logger;
 		private int _currentIndex;
 
@@ -18,7 +17,6 @@ namespace Libra.Net.Algorithms
 		{
 			ArgumentNullException.ThrowIfNull(optionsMonitor, nameof(optionsMonitor));
 			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-			_optionsMonitor = optionsMonitor;
 			var serversCount = optionsMonitor.CurrentValue.Servers.Count;
 			_servers = serversCount > 0 ? new ConcurrentDictionary<string, int>(optionsMonitor.CurrentValue.Servers.Select((s, i) => new KeyValuePair<string, int>(s, (serversCount - i) * 5)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value)) : null;
 			_logger = logger;

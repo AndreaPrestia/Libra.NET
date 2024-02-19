@@ -7,6 +7,10 @@ namespace Libra.Net
 {
 	public static class Extensions
 	{
+		/// <summary>
+		/// Add the Libra.Net configuration the HttpRequestManager and the ILoadBalancingAlgorithm implementations
+		/// </summary>
+		/// <param name="builder"></param>
 		public static void AddLibraNet(this IHostBuilder builder) 
 		{
 			builder.ConfigureServices((context, services) =>

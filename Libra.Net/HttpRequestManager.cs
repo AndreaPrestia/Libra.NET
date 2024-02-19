@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Libra.Net
 {
+	/// <summary>
+	/// This class manages the HttpRequest to be forwarded
+	/// </summary>
 	public sealed class HttpRequestManager
 	{
 		private readonly HttpClient _httpClient;

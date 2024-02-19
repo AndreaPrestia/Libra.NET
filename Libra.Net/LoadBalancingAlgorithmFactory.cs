@@ -6,6 +6,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Libra.Net
 {
+	/// <summary>
+	/// This factory is used to retrieve the ILoadBalancingAlgorithm for loadBalancingPolicy provided
+	/// </summary>
 	public sealed class LoadBalancingAlgorithmFactory
 	{
 		private readonly IServiceScopeFactory _scopeFactory;
@@ -19,18 +22,23 @@ namespace Libra.Net
 			_logger = logger;
 		}
 
-		public ILoadBalancingAlgorithm? ResolveByPolicy(string loadBalancingPolicy)
+		/// <summary>
+		/// Returns the ILoadBalancingAlgorithm implementation for loadBalancingPolicy passed as parameter.
+		/// </summary>
+		/// <param name="loadBalancingPolicy"></param>
+		/// <returns></returns>
+		public ILoadBalancingAlgorithm? ResolveByPolicy(LoadBalancingPolicy loadBalancingPolicy)
 		{
 			ArgumentNullException.ThrowIfNull(loadBalancingPolicy);
 
 			using var scope = _scopeFactory.CreateScope();
 			return loadBalancingPolicy switch
 			{
-				nameof(LoadBalancingPolicy.RoundRobin) =>
+				LoadBalancingPolicy.RoundRobin =>
 					scope.ServiceProvider.GetService<RoundRobinBalancingAlgorithm>(),
-				nameof(LoadBalancingPolicy.WeightedRoundRobin) =>
+				LoadBalancingPolicy.WeightedRoundRobin =>
 					scope.ServiceProvider.GetService<WeightedRoundRobinBalancingAlgorithm>(),
-				nameof(LoadBalancingPolicy.LeastConnections) =>
+				LoadBalancingPolicy.LeastConnections =>
 					scope.ServiceProvider.GetService<LeastConnectionsBalancingAlgorithm>(),
 				_ => null
 			};
