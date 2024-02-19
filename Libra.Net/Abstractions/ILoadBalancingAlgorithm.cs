@@ -2,7 +2,7 @@
 
 namespace Libra.Net.Abstractions
 {
-	internal interface ILoadBalancingAlgorithm
+	public interface ILoadBalancingAlgorithm
 	{
 		public Server? GetNextServer();
 	}

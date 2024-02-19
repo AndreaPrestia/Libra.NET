@@ -1,5 +1,4 @@
 ﻿using Libra.Net.Configurations;
-using Libra.Net.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -10,30 +9,27 @@ using System.Text.Json;
 
 namespace Libra.Net.Middleware
 {
-	internal class LoadBalancingMiddleware
+	public class LoadBalancingMiddleware
 	{
 		private readonly RequestDelegate _next;
 		private readonly LoadBalancingAlgorithmFactory _loadBalancingAlgorithmFactory;
 		private readonly IOptionsMonitor<LoadBalancingConfiguration> _optionsMonitor;
 		private readonly ILogger<LoadBalancingMiddleware> _logger;
-		private readonly HttpClient _httpClient;
 
 		public LoadBalancingMiddleware(RequestDelegate next, LoadBalancingAlgorithmFactory loadBalancingAlgorithmFactory, IOptionsMonitor<LoadBalancingConfiguration> optionsMonitor,	
-			ILogger<LoadBalancingMiddleware> logger, HttpClient httpClient)
+			ILogger<LoadBalancingMiddleware> logger)
 		{
 			ArgumentNullException.ThrowIfNull(next, nameof(next));
 			ArgumentNullException.ThrowIfNull(loadBalancingAlgorithmFactory, nameof(loadBalancingAlgorithmFactory));
 			ArgumentNullException.ThrowIfNull(optionsMonitor, nameof(optionsMonitor));
 			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-			ArgumentNullException.ThrowIfNull(httpClient, nameof(httpClient));
 			_next = next;
 			_loadBalancingAlgorithmFactory = loadBalancingAlgorithmFactory;
 			_optionsMonitor = optionsMonitor;
 			_logger = logger;
-			_httpClient = httpClient;
 		}
 
-		public async Task Invoke(HttpContext context)
+		public async Task Invoke(HttpContext context, HttpRequestManager httpRequestManager, CancellationToken cancellationToken)
 		{
 			var url = context.Request.Path.Value!;
 
@@ -63,7 +59,7 @@ namespace Libra.Net.Middleware
 
 				_logger.LogInformation($"Forwarding {url} {method} to {server} with policy {loadBalancingPolicy}");
 
-				await ForwardRequest(context, server);
+				await httpRequestManager.ForwardRequest(context, server, cancellationToken);
 
 				await _next.Invoke(context);
 			}
@@ -96,33 +92,6 @@ namespace Libra.Net.Middleware
 						Instance = $"{url}",
 					}));
 			}
-		}
-
-		private async Task ForwardRequest(HttpContext context, Server? destinationServer)
-		{
-			var requestMessage = new HttpRequestMessage();
-			requestMessage.Method = new HttpMethod(context.Request.Method);
-			requestMessage.RequestUri = new System.Uri($"{destinationServer?.Uri}/{context.Request.Path}");
-
-			foreach (var header in context.Request.Headers)
-			{
-				requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
-			}
-
-			if (context.Request.ContentLength is > 0)
-			{
-				requestMessage.Content = new StreamContent(context.Request.Body);
-			}
-
-			var responseMessage = await _httpClient.SendAsync(requestMessage);
-
-			context.Response.StatusCode = (int)responseMessage.StatusCode;
-			foreach (var header in responseMessage.Headers)
-			{
-				context.Response.Headers[header.Key] = header.Value.ToArray();
-			}
-
-			await responseMessage.Content.CopyToAsync(context.Response.Body);
 		}
 	}
 }

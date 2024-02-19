@@ -1,8 +1,5 @@
 ﻿using Libra.Net.Algorithms;
 using Libra.Net.Configurations;
-using Libra.Net.Middleware;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -17,7 +14,7 @@ namespace Libra.Net
 				services.Configure<LoadBalancingConfiguration>(context.Configuration.GetSection(
 					LoadBalancingConfiguration.LibraNet));
 
-				services.AddHttpClient<LoadBalancingMiddleware>("loadBalancingClient", (_, _) => { })
+				services.AddHttpClient<HttpRequestManager>("httpRequestManagerClient", (_, _) => { })
 					.ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler()
 					{
 						PooledConnectionLifetime = TimeSpan.FromMinutes(15)
@@ -28,16 +25,11 @@ namespace Libra.Net
 			});
 		}
 		
-		public static void UseLibraNet(this IApplicationBuilder app, Func<HttpContext, bool> predicate)
-		{
-			app.UseWhen(predicate,
-	appBranch => { appBranch.UseMiddleware<LoadBalancingMiddleware>(); });
-		}
-
 		private static void AddLoadBalancingAlgorithms(this IServiceCollection services)
 		{
 			ArgumentNullException.ThrowIfNull(services);
 
+			services.AddScoped<HttpRequestManager>();
 			services.AddScoped<RoundRobinBalancingAlgorithm>();
 			services.AddScoped<WeightedRoundRobinBalancingAlgorithm>();
 			services.AddScoped<LeastConnectionsBalancingAlgorithm>();

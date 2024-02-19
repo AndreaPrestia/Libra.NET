@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Libra.Net
 {
-	internal sealed class LoadBalancingAlgorithmFactory
+	public sealed class LoadBalancingAlgorithmFactory
 	{
 		private readonly IServiceScopeFactory _scopeFactory;
 		private readonly ILogger<LoadBalancingAlgorithmFactory> _logger;
