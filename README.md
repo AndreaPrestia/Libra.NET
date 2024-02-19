@@ -31,7 +31,10 @@ Add this section to appsettings.json.
    "LoadBalancingPolicy": "RoundRobin",
    "Servers": [
       "10.0.0.0",
-      "10.255.255.255"
+      "10.255.255.255",
+      "https://10.0.0.1:443",
+      "my-in-balancer-server.xyz",
+      "https://my-in-balancer-server2.xyz:443"
     ]
   }
 ```
