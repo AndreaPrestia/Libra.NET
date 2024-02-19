@@ -34,9 +34,9 @@ namespace Libra.Net
 			ArgumentNullException.ThrowIfNull(services);
 
 			services.AddScoped<HttpRequestManager>();
-			services.AddScoped<RoundRobinBalancingAlgorithm>();
-			services.AddScoped<WeightedRoundRobinBalancingAlgorithm>();
-			services.AddScoped<LeastConnectionsBalancingAlgorithm>();
+			services.AddSingleton<RoundRobinBalancingAlgorithm>();
+			services.AddSingleton<WeightedRoundRobinBalancingAlgorithm>();
+			services.AddSingleton<LeastConnectionsBalancingAlgorithm>();
 			services.AddSingleton<LoadBalancingAlgorithmFactory>();
 		}
 	}
