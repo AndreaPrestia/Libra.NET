@@ -64,7 +64,12 @@ This extension it is used for:
 It must be used to use **Libra.NET**
 
 ### HttpRequestManager
-This component exposes one method called **Task ForwardRequest(HttpContext context, Server? destinationServer, CancellationToken cancellationToken = default)** that given an HttpContext and a Server as destination forwards to it the call, waits for the response and copies it in the HttpContext.Response.
+This component exposes one method: 
+
+```
+public async Task ForwardRequest(HttpContext context, Server? destinationServer, CancellationToken cancellationToken = default)
+```
+that given an HttpContext and a Server as destination forwards to it the call, waits for the response and copies it in the HttpContext.Response.
 
 ### LoadBalacingMiddleware
 To use in a simple way **Libra.NET** there is a middleware, called **LoadBalancingMiddleware**.
