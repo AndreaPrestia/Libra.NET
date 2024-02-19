@@ -9,7 +9,7 @@ namespace Libra.Net.Algorithms
 {
 	internal class WeightedRoundRobinBalancingAlgorithm : ILoadBalancingAlgorithm
 	{
-		private readonly ConcurrentDictionary<string, int>? _servers;
+		private ConcurrentDictionary<string, int>? _servers;
 		private readonly ILogger<WeightedRoundRobinBalancingAlgorithm> _logger;
 		private int _currentIndex;
 
@@ -17,9 +17,15 @@ namespace Libra.Net.Algorithms
 		{
 			ArgumentNullException.ThrowIfNull(optionsMonitor, nameof(optionsMonitor));
 			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-			var serversCount = optionsMonitor.CurrentValue.Servers.Count;
-			_servers = serversCount > 0 ? new ConcurrentDictionary<string, int>(optionsMonitor.CurrentValue.Servers.Select((s, i) => new KeyValuePair<string, int>(s, (serversCount - i) * 5)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value)) : null;
+			_servers = optionsMonitor.CurrentValue.Servers.Count > 0 ? new ConcurrentDictionary<string, int>(optionsMonitor.CurrentValue.Servers.Select((s, i) => new KeyValuePair<string, int>(s, (optionsMonitor.CurrentValue.Servers.Count - i) * 5)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value)) : null;
 			_logger = logger;
+
+			optionsMonitor.OnChange((config, _) =>
+			{
+				_currentIndex = 0;
+
+				_servers = config.Servers.Count > 0 ? new ConcurrentDictionary<string, int>(optionsMonitor.CurrentValue.Servers.Select((s, i) => new KeyValuePair<string, int>(s, (config.Servers.Count - i) * 5)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value)) : null;
+			});
 		}
 
 		public Server? GetNextServer()

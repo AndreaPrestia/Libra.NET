@@ -9,17 +9,20 @@ namespace Libra.Net.Algorithms
 {
 	internal class LeastConnectionsBalancingAlgorithm : ILoadBalancingAlgorithm
 	{
-		private readonly ConcurrentDictionary<string, int>? _servers;
+		private ConcurrentDictionary<string, int>? _servers;
 		private readonly ILogger<LeastConnectionsBalancingAlgorithm> _logger;
-		private int _currentIndex;
 
 		public LeastConnectionsBalancingAlgorithm(IOptionsMonitor<LoadBalancingConfiguration> optionsMonitor, ILogger<LeastConnectionsBalancingAlgorithm> logger)
 		{
 			ArgumentNullException.ThrowIfNull(optionsMonitor, nameof(optionsMonitor));
 			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-			var serversCount = optionsMonitor.CurrentValue.Servers.Count;
-			_servers = serversCount > 0 ? new ConcurrentDictionary<string, int>(optionsMonitor.CurrentValue.Servers.Select(s => new KeyValuePair<string, int>(s, 0)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value)) : null;
+			_servers = optionsMonitor.CurrentValue.Servers.Count > 0 ? new ConcurrentDictionary<string, int>(optionsMonitor.CurrentValue.Servers.Select(s => new KeyValuePair<string, int>(s, 0)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value)) : null;
 			_logger = logger;
+
+			optionsMonitor.OnChange((config, _) =>
+			{
+				_servers = config.Servers.Count > 0 ? new ConcurrentDictionary<string, int>(config.Servers.Select(s => new KeyValuePair<string, int>(s, 0)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value)) : null;
+			});
 		}
 
 		public Server? GetNextServer()

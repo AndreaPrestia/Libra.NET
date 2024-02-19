@@ -9,7 +9,7 @@ namespace Libra.Net.Algorithms
 {
 	internal class RoundRobinBalancingAlgorithm : ILoadBalancingAlgorithm
 	{
-		private readonly ConcurrentBag<string> _servers;
+		private ConcurrentBag<string> _servers;
 		private int _currentIndex;
 		private readonly ILogger<RoundRobinBalancingAlgorithm> _logger;
 
@@ -19,6 +19,13 @@ namespace Libra.Net.Algorithms
 			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 			_servers = new ConcurrentBag<string>(optionsMonitor.CurrentValue.Servers);
 			_logger = logger;
+
+			optionsMonitor.OnChange((config, _) =>
+			{
+				_currentIndex = 0;
+
+				_servers = new ConcurrentBag<string>(config.Servers);
+			});
 		}
 
 		public Server? GetNextServer()

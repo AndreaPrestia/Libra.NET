@@ -27,7 +27,7 @@ namespace Libra.Net
 		{
 			var requestMessage = new HttpRequestMessage();
 			requestMessage.Method = new HttpMethod(context.Request.Method);
-			requestMessage.RequestUri = new System.Uri($"{destinationServer?.Uri}/{context.Request.Path}");
+			requestMessage.RequestUri = new System.Uri($"{destinationServer?.Endpoint}/{context.Request.Path}");
 
 			foreach (var header in context.Request.Headers)
 			{
