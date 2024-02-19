@@ -54,16 +54,18 @@ AddLibraNet(this IHostBuilder builder);
 #### AddLibraNet
 This extension it is used for:
 
-- Inject LoadBalancingConfiguration.
-- Register load balancing algorithms.
+- Registering of **LoadBalancingConfiguration** from appsettings.json by environment.
+- Registering of **ILoadBalancingAlgorithm** implementations.
+- Registering of **HttpRequestManager** implementation.
 
 It must be used to use **Libra.NET**
 
+### HttpRequestManager
+This component exposes one method called **Task ForwardRequest(HttpContext context, Server? destinationServer, CancellationToken cancellationToken = default)** that given an HttpContext and a Server as destination forwards to it the call, waits for the response and copies it in the HttpContext.Response.
+
 ### LoadBalacingMiddleware
-
 To use in a simple way **Libra.NET** it has been created a middleware, called **LoadBalancingMiddleware**.
-
-It is an **ASP.NET** middleware that , using the **LoadBalancingConfiguration.LoadBalancingPolicy** retrieves the correct algorithm and forwards it to the destination server found.
+It is an **ASP.NET** middleware that , using the **LoadBalancingConfiguration.LoadBalancingPolicy** retrieves the correct algorithm and forwards it to the destination server found with the **HttpRequestManager**.
 
 ## TODO
 
