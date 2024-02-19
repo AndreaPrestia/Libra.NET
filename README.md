@@ -11,7 +11,7 @@ It can use three load balancing algorithms:
 
 The algorithm to be used is defined in the **Libra** node of the appsettings.json file.
 
-#### RoundRobin
+### RoundRobin
 This is the simplest algorithm used by **Libra.NET**. It schedules in an equal manner the usage of the **Servers** configured.
 
 ### WeightedRoundRobin
