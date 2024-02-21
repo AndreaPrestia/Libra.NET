@@ -1,12 +1,11 @@
-﻿namespace Libra.Net.Enums
+﻿namespace Libra.Net.Enums;
+
+/// <summary>
+/// Valid Load balancing policies allowed
+/// </summary>
+public enum LoadBalancingPolicy
 {
-	/// <summary>
-	/// Valid Load balancing policies allowed
-	/// </summary>
-	public enum LoadBalancingPolicy
-	{
-		RoundRobin,
-		WeightedRoundRobin,
-		LeastConnections
-	}
+    RoundRobin,
+    WeightedRoundRobin,
+    LeastConnections
 }
