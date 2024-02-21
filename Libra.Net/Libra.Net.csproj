@@ -20,4 +20,8 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Libra.Net.Unit.Tests" />
+  </ItemGroup>
+
 </Project>
