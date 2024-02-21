@@ -77,6 +77,5 @@ It is an **ASP.NET** middleware that, using the **LoadBalancingConfiguration.Loa
 
 ## TODO
 
-- Unit testing
 - Code refactoring
 
