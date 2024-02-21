@@ -3,7 +3,6 @@ using Libra.Net.Configurations;
 using Libra.Net.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Collections.Concurrent;
 
 namespace Libra.Net.Algorithms
 {
@@ -12,23 +11,23 @@ namespace Libra.Net.Algorithms
 	/// </summary>
 	internal class RoundRobinBalancingAlgorithm : ILoadBalancingAlgorithm
 	{
-		private ConcurrentBag<string> _servers;
-		private int _currentIndex;
+        private List<string>? _servers;
+        private int _currentIndex;
 		private readonly ILogger<RoundRobinBalancingAlgorithm> _logger;
+        private readonly object _lockObject = new();
 
 		public RoundRobinBalancingAlgorithm(IOptionsMonitor<LoadBalancingConfiguration> optionsMonitor, ILogger<RoundRobinBalancingAlgorithm> logger)
 		{
 			ArgumentNullException.ThrowIfNull(optionsMonitor, nameof(optionsMonitor));
 			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-			_servers = new ConcurrentBag<string>(optionsMonitor.CurrentValue.Servers);
-			_logger = logger;
+            _logger = logger;
 
-			optionsMonitor.OnChange((config, _) =>
+            UpdateServers(optionsMonitor.CurrentValue);
+
+            optionsMonitor.OnChange((config, _) =>
 			{
-				_currentIndex = 0;
-
-				_servers = new ConcurrentBag<string>(config.Servers);
-			});
+                UpdateServers(config);
+            });
 		}
 
 		public Server? GetNextServer()
@@ -39,21 +38,44 @@ namespace Libra.Net.Algorithms
 				return null;
 			}
 
-			string server = _servers.ElementAt(_currentIndex);
+            lock (_lockObject)
+            {
+                var server = _servers.ElementAt(_currentIndex);
 
-			if (string.IsNullOrWhiteSpace(server))
-			{
-				_logger.LogWarning($"No server found at index {_currentIndex}");
-				return null;
-			}
+                if (string.IsNullOrWhiteSpace(server))
+                {
+                    _logger.LogWarning($"No server found at index {_currentIndex}");
+                    return null;
+                }
 
-			_logger.LogDebug($"Found server {server} for index {_currentIndex}");
+                _logger.LogDebug($"Found server {server} for index {_currentIndex}");
 
-			_currentIndex = (_currentIndex + 1) % _servers.Count;
+                _currentIndex = (_currentIndex + 1) % _servers.Count;
 
-			_logger.LogDebug($"New calculated index for next iteration {_currentIndex}");
+                _logger.LogDebug($"New calculated index for next iteration {_currentIndex}");
 
-			return new Server(server);
+                return new Server(server);
+            }
 		}
-	}
+
+        private void UpdateServers(LoadBalancingConfiguration? configuration)
+        {
+            if (configuration == null || configuration.Servers.Count == 0)
+            {
+                _logger.LogDebug("Servers from configuration not provided");
+                return;
+            }
+
+            lock (_lockObject)
+            {
+                _servers ??= new List<string>();
+
+                _servers.Clear();
+
+                _currentIndex = 0;
+
+                _servers = configuration.Servers;
+            }
+        }
+    }
 }
