@@ -3,11 +3,12 @@ A load balancer written in .NET
 
 ## How does it works?
 
-It can use three load balancing algorithms:
+It can use four load balancing algorithms:
 
 - Round Robin
 - Weighted Round Robin
 - Least Connections
+- Sticky Sessions
 
 The algorithm to be used is defined in the **Libra** node of the appsettings.json file.
 
@@ -21,6 +22,9 @@ If a server is in an higher position in the list the weight applied increase.
 
 ### Least Connections
 This is not so complex. Least connections load balancing is a dynamic load balancing algorithm where client requests are distributed to the application server with the least number of active connections at the time the client request is received.
+
+### Sticky Session
+This is not so complex. Sticky sessions load balancing is a dynamic load balancing algorithm where client requests are sent only to one client for session id provided.
 
 ## Configuration
 
@@ -74,8 +78,4 @@ that given an HttpContext and a Server as destination forwards to it the call, w
 ### LoadBalacingMiddleware
 To use in a simple way **Libra.NET** there is a middleware, called **LoadBalancingMiddleware**.
 It is an **ASP.NET** middleware that, using the **LoadBalancingConfiguration.LoadBalancingPolicy**, retrieves the correct algorithm to find the destination server with the **LoadBalancingAlgorithmFactory** and uses the **HttpRequestManager** to forward the request.
-
-## TODO
-
-- Code refactoring
 
