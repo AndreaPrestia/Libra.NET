@@ -7,16 +7,15 @@ using Microsoft.Extensions.Options;
 namespace Libra.Net.Algorithms
 {
     /// <summary>
-    /// This class implements the RoundRobin load balancing algorithm
+    /// This class implements the StickySession load balancing algorithm
     /// </summary>
-    internal class RoundRobinBalancingAlgorithm : ILoadBalancingAlgorithm
+    internal class StickySessionsBalancingAlgorithm : ILoadBalancingAlgorithm
     {
         private List<string>? _servers;
-        private int _currentIndex;
         private readonly ILogger<RoundRobinBalancingAlgorithm> _logger;
         private readonly object _lockObject = new();
 
-        public RoundRobinBalancingAlgorithm(IOptionsMonitor<LoadBalancingConfiguration> optionsMonitor, ILogger<RoundRobinBalancingAlgorithm> logger)
+        public StickySessionsBalancingAlgorithm(IOptionsMonitor<LoadBalancingConfiguration> optionsMonitor, ILogger<RoundRobinBalancingAlgorithm> logger)
         {
             ArgumentNullException.ThrowIfNull(optionsMonitor, nameof(optionsMonitor));
             ArgumentNullException.ThrowIfNull(logger, nameof(logger));
@@ -32,32 +31,30 @@ namespace Libra.Net.Algorithms
 
         public Server? GetNextServer(string? sessionId)
         {
-            if (sessionId != null)
+            if (sessionId == null)
             {
-                _logger.LogDebug($"Processing request for session id {sessionId}");
-            }
-
-            if (_servers == null || _servers.Count == 0)
-            {
-                _logger.LogWarning("No servers loaded in configuration.");
+                _logger.LogWarning("No sessionId provided.");
                 return null;
             }
 
             lock (_lockObject)
             {
-                var server = _servers.ElementAt(_currentIndex);
-
-                if (string.IsNullOrWhiteSpace(server))
+                if (_servers == null || _servers.Count == 0)
                 {
-                    _logger.LogWarning($"No server found at index {_currentIndex}");
+                    _logger.LogWarning("No servers loaded in configuration.");
                     return null;
                 }
 
-                _logger.LogDebug($"Found server {server} for index {_currentIndex}");
+                var hash = sessionId.GetHashCode();
+                var index = Math.Abs(hash) % _servers.Count;
 
-                _currentIndex = (_currentIndex + 1) % _servers.Count;
+                var server = _servers.ElementAt(index);
 
-                _logger.LogDebug($"New calculated index for next iteration {_currentIndex}");
+                if (string.IsNullOrWhiteSpace(server))
+                {
+                    _logger.LogWarning($"No server found at index {index}");
+                    return null;
+                }
 
                 return new Server(server);
             }
@@ -76,8 +73,6 @@ namespace Libra.Net.Algorithms
                 _servers ??= new List<string>();
 
                 _servers.Clear();
-
-                _currentIndex = 0;
 
                 _servers = configuration.Servers;
             }

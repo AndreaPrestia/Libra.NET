@@ -44,7 +44,7 @@ public class RoundRobinBalancingAlgorithmTests
         foreach (var t in _configuration.Servers)
         {
             // Act
-            var result = service.GetNextServer();
+            var result = service.GetNextServer(null);
 
             // Assert
             Assert.NotNull(result);
@@ -52,7 +52,7 @@ public class RoundRobinBalancingAlgorithmTests
         }
 
         // Act
-        var finalResult = service.GetNextServer();
+        var finalResult = service.GetNextServer(null);
 
         // Assert
         Assert.NotNull(finalResult);
@@ -69,7 +69,7 @@ public class RoundRobinBalancingAlgorithmTests
         var service = _host.Services.GetRequiredService<RoundRobinBalancingAlgorithm>();
 
         // Act
-        var result = service.GetNextServer();
+        var result = service.GetNextServer(null);
 
         // Assert
         Assert.Null(result);
@@ -87,7 +87,7 @@ public class RoundRobinBalancingAlgorithmTests
         var service = _host.Services.GetRequiredService<RoundRobinBalancingAlgorithm>();
 
         // Act
-        var result = service.GetNextServer();
+        var result = service.GetNextServer(null);
 
         // Assert
         Assert.Null(result);

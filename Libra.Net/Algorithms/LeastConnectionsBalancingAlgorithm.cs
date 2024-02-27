@@ -29,16 +29,21 @@ internal class LeastConnectionsBalancingAlgorithm : IReleaseConnectionAlgorithm
         });
     }
 
-    public Server? GetNextServer()
+    public Server? GetNextServer(string? sessionId)
     {
         lock (_lockObject)
         {
+            if (sessionId != null)
+            {
+                _logger.LogDebug($"Processing request for session id {sessionId}");
+            }
+
             if (_servers == null || _servers.Count == 0)
             {
                 _logger.LogWarning("No servers loaded in configuration.");
                 return null;
             }
-          
+
             var selectedServer = _servers.MinBy(s => s.Value);
             _logger.LogDebug($"Server {selectedServer.Key} connections count {selectedServer.Value}");
 

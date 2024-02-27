@@ -9,6 +9,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security;
 using System.Text.Json;
 using Libra.Net.Abstractions;
+using Libra.Net.Algorithms;
+using Libra.Net.Entities;
 
 namespace Libra.Net.Middleware;
 
@@ -56,9 +58,19 @@ public class LoadBalancingMiddleware
                     $"LoadBalancingPolicy {loadBalancingPolicy} not supported. No request will be processed.");
             }
 
-            var server = algorithm.GetNextServer();
+            Server? server;
 
-            if(server == null)
+            if (algorithm is StickySessionsBalancingAlgorithm stickySessionsAlgorithm)
+            {
+                _logger.LogDebug($"Using StickySessionsBalancingAlgorithm for request {url} {method}");
+                server = stickySessionsAlgorithm.GetNextServer(context.Session.Id);
+            }
+            else
+            {
+                server = algorithm.GetNextServer(null);
+            }
+
+            if (server == null)
             {
                 throw new InvalidOperationException(
                     $"LoadBalancingPolicy {loadBalancingPolicy} did not found any server available. No request will be processed.");

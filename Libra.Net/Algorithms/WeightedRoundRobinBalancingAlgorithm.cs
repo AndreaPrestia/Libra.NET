@@ -30,8 +30,13 @@ namespace Libra.Net.Algorithms
             });
         }
 
-        public Server? GetNextServer()
+        public Server? GetNextServer(string? sessionId)
         {
+            if (sessionId != null)
+            {
+                _logger.LogDebug($"Processing request for session id {sessionId}");
+            }
+
             if (_servers == null || _servers.Count == 0)
             {
                 _logger.LogWarning("No servers loaded in configuration.");

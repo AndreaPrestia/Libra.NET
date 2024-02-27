@@ -50,7 +50,7 @@ namespace Libra.Net.Unit.Tests.Algorithms
             foreach (var t in _configuration.Servers)
             {
                 // Act
-                var result = service.GetNextServer();
+                var result = service.GetNextServer(null);
 
                 // Assert
                 Assert.NotNull(result);
@@ -58,7 +58,7 @@ namespace Libra.Net.Unit.Tests.Algorithms
             }
 
             // Act
-            var finalResult = service.GetNextServer();
+            var finalResult = service.GetNextServer(null);
 
             // Assert
             Assert.NotNull(finalResult);
@@ -74,7 +74,7 @@ namespace Libra.Net.Unit.Tests.Algorithms
             foreach (var t in _configuration.Servers)
             {
                 // Act
-                var result = service.GetNextServer();
+                var result = service.GetNextServer(null);
 
                 // Assert
                 Assert.NotNull(result);
@@ -84,7 +84,7 @@ namespace Libra.Net.Unit.Tests.Algorithms
             }
 
             // Act
-            var finalResult = service.GetNextServer();
+            var finalResult = service.GetNextServer(null);
 
             // Assert
             Assert.NotNull(finalResult);
@@ -101,7 +101,7 @@ namespace Libra.Net.Unit.Tests.Algorithms
             var service = _host.Services.GetRequiredService<LeastConnectionsBalancingAlgorithm>();
 
             // Act
-            var result = service.GetNextServer();
+            var result = service.GetNextServer(null);
 
             // Assert
             Assert.Null(result);
@@ -119,7 +119,7 @@ namespace Libra.Net.Unit.Tests.Algorithms
             var service = _host.Services.GetRequiredService<LeastConnectionsBalancingAlgorithm>();
 
             // Act
-            var result = service.GetNextServer();
+            var result = service.GetNextServer(null);
 
             // Assert
             Assert.Null(result);
